@@ -17,7 +17,7 @@ if len(sys.argv) < 3:
 # load source
 if sys.argv[1] == 'V':
         if sys.argv[2] == "0":
-                droidcam_ip = "10.0.0.65"  # Your DroidCam IP address
+                droidcam_ip = "10.0.0.94"  # Your DroidCam IP address
                 port = "4747"  # Default DroidCam port
                 rtsp_url = f"http://{droidcam_ip}:{port}/video"  # RTSP URL for DroidCam
                 cap = cv2.VideoCapture(rtsp_url)
@@ -45,7 +45,7 @@ model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 
 #pop = 0
 
-def detect(frame):
+def detect(frame, outframe):
         # Pass image through model, boxes collects coords for all directions, then
         # filter for only those with people
         output = model(frame)
@@ -58,13 +58,13 @@ def detect(frame):
         for *box, in peopleBoxes:
                 rand = random.randint(0, 255)
                 box = list(map(int, box))
-                cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), 
+                cv2.rectangle(outframe, (box[0], box[1]), (box[2], box[3]), 
                               (rand, 255 - rand, 0), 2)
                 
-        cv2.putText(frame, f"Found: {pop}", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 
+        cv2.putText(outframe, f"Found: {pop}", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 
                             1.3, (255, 255, 255), 2)
                 
-        return frame
+        return outframe
 
 
 
@@ -80,7 +80,8 @@ if sys.argv[1] == 'V':
                         if (frameCount % 10) == 0:
                                 frameCount += 1
                                 # Show image with boxes
-                                cv2.imshow("Output", detect(frame))
+                                frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                                cv2.imshow("Output", detect(frameGray, frame))
                                 if cv2.waitKey(1) == ord('q'):
                                         break
                         else : frameCount += 1
@@ -94,11 +95,13 @@ if sys.argv[1] == 'V':
                         ret, frame = cap.read()
                         if not ret:
                                 break
-                        writer.write(detect(frame))
+                        frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                        writer.write(detect(frameGray, frame))
                 cap.release()
 else:
         # Show image with boxes
-        output = detect(img)
+        imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        output = detect(imgGray, img)
         if len(sys.argv) == 4:
                 cv2.imwrite(sys.argv[3] + ".jpg", output)
         cv2.imshow("Output", output)
