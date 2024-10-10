@@ -1,6 +1,5 @@
 import torch
 import cv2
-import random
 import sys
 import warnings
 
@@ -51,7 +50,7 @@ def detect(frame, outframe):
 
         pop = len(peopleBoxes)
 
-        # Draw boxes for every person found with varying colors
+        # Draw boxes for every person found with colors based on confidence, blue = higher
         for *box, in peopleBoxes:
                 cv2.rectangle(outframe, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), 
                               (int(255 * box[4]), 0, int(255 * (1 - box[4]))), 2)
@@ -72,14 +71,15 @@ if sys.argv[1] == 'V':
                         ret, frame = cap.read()
                         if not ret:
                                 break
-                        if (frameCount % 2) == 0:
-                                frameCount += 1
-                                # Show image with boxes
-                                frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                                cv2.imshow("Output", detect(frameGray, frame))
-                                if cv2.waitKey(1) == ord('q'):
-                                        break
-                        else : frameCount += 1
+                        #vv frame limiter for weaker machines
+                        #if (frameCount % 2) == 0:
+                        #        frameCount += 1
+                        # Show image with boxes
+                        frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                        cv2.imshow("Output", detect(frameGray, frame))
+                        if cv2.waitKey(1) == ord('q'):
+                                break
+                        #else : frameCount += 1
                 cap.release()
         else:
                 out_name = "output" if len(sys.argv) == 3 else sys.argv[3]
