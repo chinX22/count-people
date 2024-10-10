@@ -17,10 +17,7 @@ if len(sys.argv) < 3:
 # load source
 if sys.argv[1] == 'V':
         if sys.argv[2] == "0":
-                droidcam_ip = "10.0.0.94"  # Your DroidCam IP address
-                port = "4747"  # Default DroidCam port
-                rtsp_url = f"http://{droidcam_ip}:{port}/video"  # RTSP URL for DroidCam
-                cap = cv2.VideoCapture(rtsp_url)
+                cap = cv2.VideoCapture(0)
         else:
                 cap = cv2.VideoCapture(sys.argv[2])
         if not cap.isOpened():
@@ -56,10 +53,8 @@ def detect(frame, outframe):
 
         # Draw boxes for every person found with varying colors
         for *box, in peopleBoxes:
-                rand = random.randint(0, 255)
-                box = list(map(int, box))
-                cv2.rectangle(outframe, (box[0], box[1]), (box[2], box[3]), 
-                              (rand, 255 - rand, 0), 2)
+                cv2.rectangle(outframe, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), 
+                              (int(255 * box[4]), 0, int(255 * (1 - box[4]))), 2)
                 
         cv2.putText(outframe, f"Found: {pop}", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 
                             1.3, (255, 255, 255), 2)
@@ -77,7 +72,7 @@ if sys.argv[1] == 'V':
                         ret, frame = cap.read()
                         if not ret:
                                 break
-                        if (frameCount % 10) == 0:
+                        if (frameCount % 2) == 0:
                                 frameCount += 1
                                 # Show image with boxes
                                 frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
