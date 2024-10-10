@@ -17,10 +17,7 @@ if len(sys.argv) < 3:
 # load source
 if sys.argv[1] == 'V':
         if sys.argv[2] == "0":
-                droidcam_ip = "10.0.0.94"  # Your DroidCam IP address
-                port = "4747"  # Default DroidCam port
-                rtsp_url = f"http://{droidcam_ip}:{port}/video"  # RTSP URL for DroidCam
-                cap = cv2.VideoCapture(rtsp_url)
+                cap = cv2.VideoCapture(0)
         else:
                 cap = cv2.VideoCapture(sys.argv[2])
         if not cap.isOpened():
